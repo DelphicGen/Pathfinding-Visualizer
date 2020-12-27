@@ -11,15 +11,13 @@ function PathfindingVisualizer() {
         row: 5,
         col: 10
     })
-    const [finishNodePosition, setEndNodePosition] = useState({
+    const [finishNodePosition, setFinishNodePosition] = useState({
         row: 7,
         col: 32
     })
     const [dragAndDrop, setDragAndDrop] = useState({
         isDragging: false,
         draggedNode: null,
-        draggedFrom: null,
-        draggedTo: null
     })
 
     // <-------------------- Grid and Node --------------------->
@@ -83,7 +81,8 @@ function PathfindingVisualizer() {
 
     // <-------------------- Event Listener --------------------->
     const onMouseDownHandler = (row, col) => {
-        if(dragAndDrop.isDragging || grid[row][col].isStart || grid[row][col].isFinish) return;
+        console.log(dragAndDrop)
+        // if(dragAndDrop.isDragging || grid[row][col].isStart || grid[row][col].isFinish) return;
         const newGrid = getNewGridWithWallToggled(grid, row, col)
         setIsMouseDown(true)
         setGrid(newGrid)
@@ -94,19 +93,23 @@ function PathfindingVisualizer() {
     }
 
     const onMouseEnterHandler = (row, col) => {
-        if(!isMouseDown || dragAndDrop.isDragging) return;
+        // if(!isMouseDown || dragAndDrop.isDragging) return;
+        if(!isMouseDown) return;
         const newGrid = getNewGridWithWallToggled(grid, row, col)
         setGrid(newGrid)
     }
 
     const onDragStart = (node) => {
-        if(isMouseDown) return;
+        // if(isMouseDown) return;
         setDragAndDrop(prevState => ({
             ...prevState,
             isDragging: true,
-            draggedNode: node,
-            draggedFrom: [node.row, node.col],
+            draggedNode: node
         }))
+    }
+
+    const onDragOver = e => {
+        e.preventDefault()
     }
 
     const onDrop = (node) => {
@@ -118,7 +121,7 @@ function PathfindingVisualizer() {
                 col: node.col
             }))
         } else {
-            setEndNodePosition(prevState => ({
+            setFinishNodePosition(prevState => ({
                 ...prevState,
                 row: node.row,
                 col: node.col
@@ -180,8 +183,8 @@ function PathfindingVisualizer() {
                                     row.map((node, i) => {
                                         return (
                                             node.isStart || node.isFinish ? 
-                                            <Node node={node} key={i} onMouseDownHandler={onMouseDownHandler} onMouseEnterHandler={onMouseEnterHandler} onDragStart={onDragStart} onDrop={onDrop} /> : 
-                                            <Node node={node} key={i} onMouseDownHandler={onMouseDownHandler} onMouseEnterHandler={onMouseEnterHandler} onDrop={onDrop} />
+                                            <Node node={node} key={i} onDragStart={onDragStart} onDrop={onDrop} /> : 
+                                            <Node node={node} key={i} onMouseDownHandler={onMouseDownHandler} onMouseEnterHandler={onMouseEnterHandler} onDragOver={onDragOver} onDrop={onDrop} />
                                         )
                                     })
                                 }

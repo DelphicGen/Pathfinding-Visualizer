@@ -15,8 +15,9 @@ function Node({ node, onMouseDownHandler, onMouseEnterHandler, onDragStart, onDr
             id={`node-${node.row}-${node.col}`}
             className={`mb-1 mr-1 cursor-pointer node ${nodeColor}`} 
             style={{width: '25px', height: '25px'}}
-            onMouseDown={() => onMouseDownHandler(node.row, node.col)}
-            onMouseEnter={() => onMouseEnterHandler(node.row, node.col)}
+            onMouseDown={() => onMouseDownHandler && onMouseDownHandler(node.row, node.col)}
+            onMouseEnter={() => onMouseEnterHandler && onMouseEnterHandler(node.row, node.col)}
+            onDragOver={onDragOver}
             onDrop={() => onDrop(node)} 
         >
             {
