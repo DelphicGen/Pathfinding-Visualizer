@@ -12,7 +12,7 @@ function PathfindingVisualizer() {
         col: 10
     })
     const [finishNodePosition, setFinishNodePosition] = useState({
-        row: 7,
+        row: 5,
         col: 32
     })
     const [dragAndDrop, setDragAndDrop] = useState({
@@ -21,7 +21,7 @@ function PathfindingVisualizer() {
     })
 
     // <-------------------- Grid and Node --------------------->
-    const createNode = useCallback((row, col) => {
+    const createNode = (row, col) => {
         return {
             col,
             row,
@@ -32,9 +32,9 @@ function PathfindingVisualizer() {
             isWall: false,
             previousNode: null,
         }
-    }, [finishNodePosition.col, finishNodePosition.row, startNodePosition.col, startNodePosition.row])
+    }
 
-    const generateInitialGrid = useCallback(() => {
+    const generateInitialGrid = (totalReset = false) => {
         let tempGrid = [];
         let tempRow = [];
 
@@ -42,7 +42,7 @@ function PathfindingVisualizer() {
 
             tempRow = []
             for(let j = 0; j < 40; j++) {
-                if(grid && grid[i][j].isWall) tempRow.push(grid[i][j]);
+                if(!totalReset && grid && grid[i][j].isWall && !grid[i][j].isVisited) tempRow.push(grid[i][j]);
                 else tempRow.push(createNode(i, j));
             }
             tempGrid.push(tempRow)
@@ -50,7 +50,7 @@ function PathfindingVisualizer() {
         }
 
         return tempGrid
-    }, [createNode])
+    }
 
     const getNewGridWithWallToggled = (grid, row, col) => {
         const newGrid = [...grid]
@@ -59,7 +59,7 @@ function PathfindingVisualizer() {
     } 
 
     const resetGrid = () => {
-        const initialGrid = generateInitialGrid()
+        const initialGrid = generateInitialGrid(true)
         setGrid(initialGrid)  
 
         const tempGrid = [...grid]
@@ -77,12 +77,10 @@ function PathfindingVisualizer() {
         
         window.addEventListener('mouseup', onMouseUpHandler)
         return () => window.removeEventListener('mouseup', onMouseUpHandler);
-    }, [generateInitialGrid])
+    }, [finishNodePosition.col, finishNodePosition.row, startNodePosition.col, startNodePosition.row])
 
     // <-------------------- Event Listener --------------------->
     const onMouseDownHandler = (row, col) => {
-        console.log(dragAndDrop)
-        // if(dragAndDrop.isDragging || grid[row][col].isStart || grid[row][col].isFinish) return;
         const newGrid = getNewGridWithWallToggled(grid, row, col)
         setIsMouseDown(true)
         setGrid(newGrid)
@@ -93,14 +91,12 @@ function PathfindingVisualizer() {
     }
 
     const onMouseEnterHandler = (row, col) => {
-        // if(!isMouseDown || dragAndDrop.isDragging) return;
         if(!isMouseDown) return;
         const newGrid = getNewGridWithWallToggled(grid, row, col)
         setGrid(newGrid)
     }
 
     const onDragStart = (node) => {
-        // if(isMouseDown) return;
         setDragAndDrop(prevState => ({
             ...prevState,
             isDragging: true,
